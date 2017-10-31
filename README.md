@@ -1,82 +1,59 @@
-Bitcoin Core integration/staging tree
-=====================================
+### Usage
 
-[![Build Status](https://travis-ci.org/bitcoin/bitcoin.svg?branch=master)](https://travis-ci.org/bitcoin/bitcoin)
+To build dependencies for the current arch+OS:
 
-https://bitcoincore.org
+    make
 
-What is Bitcoin?
-----------------
+To build for another arch/OS:
 
-Bitcoin is an experimental digital currency that enables instant payments to
-anyone, anywhere in the world. Bitcoin uses peer-to-peer technology to operate
-with no central authority: managing transactions and issuing money are carried
-out collectively by the network. Bitcoin Core is the name of open source
-software which enables the use of this currency.
+    make HOST=host-platform-triplet
 
-For more information, as well as an immediately useable, binary version of
-the Bitcoin Core software, see https://bitcoin.org/en/download, or read the
-[original whitepaper](https://bitcoincore.org/bitcoin.pdf).
+For example:
 
-License
--------
+    make HOST=x86_64-w64-mingw32 -j4
 
-Bitcoin Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
-information or see https://opensource.org/licenses/MIT.
+A prefix will be generated that's suitable for plugging into Bitcoin's
+configure. In the above example, a dir named x86_64-w64-mingw32 will be
+created. To use it for Bitcoin:
 
-Development Process
--------------------
+    ./configure --prefix=`pwd`/depends/x86_64-w64-mingw32
 
-The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/bitcoin/bitcoin/tags) are created
-regularly to indicate new official, stable release versions of Bitcoin Core.
+Common `host-platform-triplets` for cross compilation are:
 
-The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md).
+- `i686-w64-mingw32` for Win32
+- `x86_64-w64-mingw32` for Win64
+- `x86_64-apple-darwin11` for MacOSX
+- `arm-linux-gnueabihf` for Linux ARM 32 bit
+- `aarch64-linux-gnu` for Linux ARM 64 bit
 
-The developer [mailing list](https://lists.linuxfoundation.org/mailman/listinfo/bitcoin-dev)
-should be used to discuss complicated or controversial changes before working
-on a patch set.
+No other options are needed, the paths are automatically configured.
 
-Developer IRC can be found on Freenode at #bitcoin-core-dev.
+Dependency Options:
+The following can be set when running make: make FOO=bar
 
-Testing
--------
+    SOURCES_PATH: downloaded sources will be placed here
+    BASE_CACHE: built packages will be placed here
+    SDK_PATH: Path where sdk's can be found (used by OSX)
+    FALLBACK_DOWNLOAD_PATH: If a source file can't be fetched, try here before giving up
+    NO_QT: Don't download/build/cache qt and its dependencies
+    NO_WALLET: Don't download/build/cache libs needed to enable the wallet
+    NO_UPNP: Don't download/build/cache packages needed for enabling upnp
+    DEBUG: disable some optimizations and enable more runtime checking
+    HOST_ID_SALT: Optional salt to use when generating host package ids
+    BUILD_ID_SALT: Optional salt to use when generating build package ids
 
-Testing and code review is the bottleneck for development; we get more pull
-requests than we can review and test on short notice. Please be patient and help out by testing
-other people's pull requests, and remember this is a security-critical project where any mistake might cost people
-lots of money.
+If some packages are not built, for example `make NO_WALLET=1`, the appropriate
+options will be passed to bitcoin's configure. In this case, `--disable-wallet`.
 
-### Automated Testing
+Additional targets:
 
-Developers are strongly encouraged to write [unit tests](src/test/README.md) for new code, and to
-submit new unit tests for old code. Unit tests can be compiled and run
-(assuming they weren't disabled in configure) with: `make check`. Further details on running
-and extending unit tests can be found in [/src/test/README.md](/src/test/README.md).
+    download: run 'make download' to fetch all sources without building them
+    download-osx: run 'make download-osx' to fetch all sources needed for osx builds
+    download-win: run 'make download-win' to fetch all sources needed for win builds
+    download-linux: run 'make download-linux' to fetch all sources needed for linux builds
 
-There are also [regression and integration tests](/test), written
-in Python, that are run automatically on the build server.
-These tests can be run (if the [test dependencies](/test) are installed) with: `test/functional/test_runner.py`
+### Other documentation
 
-The Travis CI system makes sure that every pull request is built for Windows, Linux, and OS X, and that unit/sanity tests are run automatically.
+- [description.md](description.md): General description of the depends system
+- [packages.md](packages.md): Steps for adding packages
 
-### Manual Quality Assurance (QA) Testing
-
-Changes should be tested by somebody other than the developer who wrote the
-code. This is especially important for large or high-risk changes. It is useful
-to add a test plan to the pull request description if testing the changes is
-not straightforward.
-
-Translations
-------------
-
-Changes to translations as well as new translations can be submitted to
-[Bitcoin Core's Transifex page](https://www.transifex.com/projects/p/bitcoin/).
-
-Translations are periodically pulled from Transifex and merged into the git repository. See the
-[translation process](doc/translation_process.md) for details on how this works.
-
-**Important**: We do not accept translation changes as GitHub pull requests because the next
-pull from Transifex would automatically overwrite them again.
-
-Translators should also subscribe to the [mailing list](https://groups.google.com/forum/#!forum/bitcoin-translators).
